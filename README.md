@@ -1,8 +1,9 @@
 # ZETACHAIND71
 
 ## Steps to run the hello example
-- Prerequisites: You should have some Zeta and SepoliaETH.
-First clone the repo and run yarn:
+- Prerequisites: You should have some Zeta and SepoliaETH. Copy your private key into the .env file. You can check your private key by clicking metamask -> three dots -> account details -> show private key. It'll look something like this:![image](https://github.com/user-attachments/assets/d1d0a78d-a494-4576-b1ec-bd1142199337)
+
+- First clone the repo and run yarn:
 ```
 git clone https://github.com/zeta-chain/example-contracts
 cd example-contracts/examples/hello
