@@ -27,10 +27,10 @@ contract BaseSepoliaContract {
         
         // bytes memory message;
 
-        // bytes memory message = abi.encode(result, nftRecipient);
-        bytes memory message = abi.encodePacked(
-            abi.encode(result, nftRecipient)
-        );
+        bytes memory message = abi.encode(result, nftRecipient);
+        // bytes memory message = abi.encodePacked(
+        //     abi.encode(result, nftRecipient)
+        // );
         // ethers.js equivialent needs to be the following
         // bytes memory message = ethers.utils.defaultAbiCoder.encode(
         //     types,
