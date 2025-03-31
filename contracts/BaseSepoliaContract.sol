@@ -20,19 +20,19 @@ contract BaseSepoliaContract {
         zetaChainContractAddress = _zetaChainContractAddress;
     }
     
-    function checkConditionAndSend(uint256 value, address recipient) external payable {
+    function checkConditionAndSend(uint256 value, address nftRecipient) external payable {
         bool result = value > threshold;
         
-        emit ConditionResult(result, recipient);
+        emit ConditionResult(result, nftRecipient);
 
-        bytes memory message = abi.encode(result, recipient);
+        bytes memory message = abi.encode(result, nftRecipient);
         
         RevertOptions memory revertOptions = RevertOptions({
             revertAddress: msg.sender,
             callOnRevert: true,
             abortAddress: address(0),
             revertMessage: message,
-            onRevertGasLimit: 50000
+            onRevertGasLimit: 500000
         });
         
         // Send message to ZetaChain
@@ -42,6 +42,6 @@ contract BaseSepoliaContract {
             revertOptions
         );
         
-        emit MessageSent(zetaChainContractAddress, result, recipient);
+        emit MessageSent(zetaChainContractAddress, result, nftRecipient);
     }
 }

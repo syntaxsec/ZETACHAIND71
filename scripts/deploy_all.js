@@ -27,11 +27,7 @@ async function main() {
   
   console.log("Deploying Sepolia contract...");
   const sepoliaFactory = await hre.ethers.getContractFactory("SepoliaContract");
-  console.log("contract factory finished");
-
   const sepoliaContract = await sepoliaFactory.deploy(GATEWAY_ADDRESSES.sepolia);
-  console.log("deploy setup finished");
-
   await sepoliaContract.deployed();
   console.log(`Sepolia contract deployed to: ${sepoliaContract.address}`);
   deploymentInfo.sepolia = sepoliaContract.address;

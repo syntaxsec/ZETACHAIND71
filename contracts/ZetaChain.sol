@@ -18,14 +18,13 @@ contract ZetaChainContract is UniversalContract {
     error TransferFailed();
     error Unauthorized();
     
-    // this should only be from Base Sepolia
     modifier onlyGateway() {
         if (msg.sender != address(gateway)) revert Unauthorized();
         _;
     }
     
     constructor(address payable gatewayAddress, address _sepoliaContractAddress) {
-        gateway = GatewayZEVM(gatewayAddress);  // the base sepolia gateway address
+        gateway = GatewayZEVM(gatewayAddress); // zetachain gateway
         sepoliaContractAddress = _sepoliaContractAddress;
     }
     
@@ -40,7 +39,7 @@ contract ZetaChainContract is UniversalContract {
         emit MessageReceived(string(context.origin), result, nftRecipient);
         
         // Forward to Sepolia
-        forwardToSepolia(result, nftRecipient);
+        // forwardToSepolia(result, nftRecipient);
     }
     
     // Forward message to Sepolia
