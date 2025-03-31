@@ -21,15 +21,26 @@ contract BaseSepoliaContract {
     }
     
     function checkConditionAndSend(uint256 value, address nftRecipient) external payable {
-        bool result = value > threshold;
+        bool result = value >= threshold;
         
         emit ConditionResult(result, nftRecipient);
+        
+        // bytes memory message;
 
-        bytes memory message = abi.encode(result, nftRecipient);
+        // bytes memory message = abi.encode(result, nftRecipient);
+        bytes memory message = abi.encodePacked(
+            abi.encode(result, nftRecipient)
+        );
+        // ethers.js equivialent needs to be the following
+        // bytes memory message = ethers.utils.defaultAbiCoder.encode(
+        //     types,
+        //     valuesArray
+        // );
+
         
         RevertOptions memory revertOptions = RevertOptions({
             revertAddress: msg.sender,
-            callOnRevert: true,
+            callOnRevert: false,
             abortAddress: address(0),
             revertMessage: message,
             onRevertGasLimit: 500000

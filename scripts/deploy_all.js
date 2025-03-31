@@ -9,10 +9,15 @@ async function main() {
   console.log("Starting deployment process...");
   
   // more details: https://www.zetachain.com/docs/reference/network/contracts/
-  const GATEWAY_ADDRESSES = {
-    baseSepolia: "0x0c487a766110c85d301d96e33579c5b317fa4995",
-    zetachain: "0x6c533f7fe93fae114d0954697069df33c9b74fd7", 
-    sepolia: "0x0c487a766110c85d301d96e33579c5b317fa4995"  
+  // const GATEWAY_ADDRESSES = {
+  //   baseSepolia: "0x0c487a766110c85d301d96e33579c5b317fa4995",
+  //   zetachain: "0x6c533f7fe93fae114d0954697069df33c9b74fd7", 
+  //   sepolia: "0x0c487a766110c85d301d96e33579c5b317fa4995"  
+  // };
+  GATEWAY_ADDRESSES = {
+    baseSepolia: "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+    zetachain: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707", 
+    sepolia: "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0"  
   };
   
   const deploymentInfo = {};

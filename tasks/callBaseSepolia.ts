@@ -1,9 +1,10 @@
 import { task, types } from "hardhat/config";
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
-import json from "./deployment-info.json"
+// import json from "./deployment-info.json"
 const fs = require("fs");
 const path = require("path");
 
+// npx hardhat callBaseSepolia --network localhost --nftReceiver 0xF93EfaF39040BA4C32271E3256B8847fD94386DF
 
 const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
   const { ethers } = hre;
@@ -54,8 +55,7 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
 
   const factory = (await hre.ethers.getContractFactory("BaseSepoliaContract")) as any;
   const contract = factory.attach(baseSepoliaAddress).connect(signer);
-  const nftReceiver = args.nftReceiver ? args.nftReceiver : "0xF93EfaF39040BA4C32271E3256B8847fD94386DF";
-  const tx = await contract.checkConditionAndSend(101, nftReceiver);
+  const tx = await contract.checkConditionAndSend(1, args.nftreceiver);
 
   await tx.wait();
   console.log(`Transaction hash: ${tx.hash}`);
@@ -65,4 +65,26 @@ task(
   "callBaseSepolia",
   "Make a call from a connected chain to a universal app on ZetaChain",
   main
-)
+).addOptionalParam(
+  "nftreceiver",
+  "the address of the NFT receiver",
+  "0xF93EfaF39040BA4C32271E3256B8847fD94386DF"
+);
+// .addFlag("callOnRevert", "Whether to call on revert")
+// .addOptionalParam(
+//   "revertAddress",
+//   "Revert address",
+//   "0x0000000000000000000000000000000000000000"
+// )
+// .addOptionalParam(
+//   "abortAddress",
+//   "Abort address",
+//   "0x0000000000000000000000000000000000000000"
+// )
+// .addOptionalParam("revertMessage", "Revert message", "0x")
+// .addOptionalParam(
+//   "onRevertGasLimit",
+//   "The gas limit for the revert transaction",
+//   500000,
+//   types.int
+// );
