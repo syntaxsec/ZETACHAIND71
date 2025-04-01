@@ -5,6 +5,9 @@ const path = require("path");
 // for testing in localnet:
 // npx hardhat run scripts/deploy_all.js --network localhost
 
+// npx hardhat compile --force ; npx hardhat run scripts/deploy_all.js --network localhost    
+// npx hardhat callBaseSepolia --network localhost --nftreceiver 0xF93EfaF39040BA4C32271E3256B8847fD94386DF
+
 async function main() {
   console.log("Starting deployment process...");
   

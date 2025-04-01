@@ -4,6 +4,8 @@ pragma solidity 0.8.26;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {RevertContext} from "@zetachain/protocol-contracts/contracts/Revert.sol";
 import "@zetachain/protocol-contracts/contracts/evm/GatewayEVM.sol";
+import "hardhat/console.sol";
+
 
 contract SepoliaContract is ERC721 {
     
@@ -40,9 +42,11 @@ contract SepoliaContract is ERC721 {
         
         emit MessageReceived(string(abi.encodePacked(msg.sender)), nftRecipient, result);
         
-        if (result) {
-            mintNFT(nftRecipient);
-        }
+        console.log("message successfully sent");
+        console.log(result);
+        // if (result) {
+        //     mintNFT(nftRecipient);
+        // }
         
         return "";
     }

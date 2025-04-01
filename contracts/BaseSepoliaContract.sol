@@ -24,24 +24,14 @@ contract BaseSepoliaContract {
         bool result = value >= threshold;
         
         emit ConditionResult(result, nftRecipient);
-        
-        // bytes memory message;
 
         bytes memory message = abi.encode(result, nftRecipient);
-        // bytes memory message = abi.encodePacked(
-        //     abi.encode(result, nftRecipient)
-        // );
-        // ethers.js equivialent needs to be the following
-        // bytes memory message = ethers.utils.defaultAbiCoder.encode(
-        //     types,
-        //     valuesArray
-        // );
 
         
         RevertOptions memory revertOptions = RevertOptions({
             revertAddress: msg.sender,
             callOnRevert: false,
-            abortAddress: address(0),
+            abortAddress: address(0x2ca7d64A7EFE2D62A725E2B35Cf7230D6677FfEe),
             revertMessage: message,
             onRevertGasLimit: 500000
         });
