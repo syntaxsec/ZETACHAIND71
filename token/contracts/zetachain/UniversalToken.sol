@@ -41,39 +41,9 @@ contract UniversalToken is
     ) public 
     initializer 
     {
-        // __ERC20_init(name, symbol);
-        // __ERC20Burnable_init();
-        // __ERC20Pausable_init();
         __Ownable_init(initialOwner);
-        // __UUPSUpgradeable_init();
         __UniversalTokenCore_init(gatewayAddress, gas, uniswapRouterAddress); // Initialize the Universal Token core contract
     }
-
-    // function pause() public onlyOwner {
-    //     _pause();
-    // }
-
-    // function unpause() public onlyOwner {
-    //     _unpause();
-    // }
-
-    // function mint(address to, uint256 amount) public onlyOwner {
-    //     _mint(to, amount);
-    // }
-
-    // function _authorizeUpgrade(
-    //     address newImplementation
-    // ) internal override onlyOwner {}
-
-    // The following functions are overrides required by Solidity.
-
-    // function _update(
-    //     address from,
-    //     address to,
-    //     uint256 value
-    // ) internal override(ERC20Upgradeable, ERC20PausableUpgradeable) {
-    //     super._update(from, to, value);
-    // }
 
     receive() external payable {}
 }

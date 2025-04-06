@@ -32,10 +32,10 @@ SENDER=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 CONTRACT_ZETACHAIN=$(npx hardhat token:deploy --name ZetaChainUniversalToken --network localhost --gateway "$GATEWAY_ZETACHAIN" --uniswap-router "$UNISWAP_ROUTER" --json | jq -r '.contractAddress')
 echo -e "\n🚀 Deployed contract on ZetaChain: $CONTRACT_ZETACHAIN"
 
-CONTRACT_ETHEREUM=$(npx hardhat token:deploy --name EVMUniversalToken --json --network localhost --gateway "$GATEWAY_ETHEREUM" | jq -r '.contractAddress')
+CONTRACT_ETHEREUM=$(npx hardhat token:deploy --name EVMConnectedNFT --json --network localhost --gateway "$GATEWAY_ETHEREUM" | jq -r '.contractAddress')
 echo -e "🚀 Deployed contract on EVM chain: $CONTRACT_ETHEREUM"
 
-CONTRACT_BNB=$(npx hardhat token:deploy --name EVMUniversalToken --json --network localhost --gateway "$GATEWAY_BNB" | jq -r '.contractAddress')
+CONTRACT_BNB=$(npx hardhat token:deploy --name EVMConnectedNFT --json --network localhost --gateway "$GATEWAY_BNB" | jq -r '.contractAddress')
 echo -e "🚀 Deployed contract on BNB chain: $CONTRACT_BNB"
 
 echo -e "\n📮 User Address: $SENDER"
@@ -73,4 +73,4 @@ npx hardhat localnet-check
 # npx hardhat localnet-check
 # balance
 
-npx hardhat localnet-stop
+# npx hardhat localnet-stop

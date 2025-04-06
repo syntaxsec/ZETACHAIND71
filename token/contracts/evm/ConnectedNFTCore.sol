@@ -6,6 +6,8 @@ import {RevertOptions} from "@zetachain/protocol-contracts/contracts/evm/Gateway
 import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {console} from "hardhat/console.sol";
+import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+
 import "../shared/UniversalTokenEvents.sol";
 
 /**
@@ -16,8 +18,10 @@ import "../shared/UniversalTokenEvents.sol";
  *      contract facilitates cross-chain token transfers to and from EVM-based networks.
  *      It's important to set the universal contract address before making cross-chain transfers.
  */
-abstract contract UniversalTokenCore is
+abstract contract ConnectedNFTCore is
     // ERC20Upgradeable,
+    ERC721Upgradeable,
+
     OwnableUpgradeable,
     UniversalTokenEvents
 {
@@ -28,6 +32,7 @@ abstract contract UniversalTokenCore is
     // as a key component for handling all cross-chain transfers while also functioning
     // as an ERC-20 Universal Token.
     address public universal;
+    uint256 public nextTokenId;
 
     // The amount of gas used when making cross-chain transfers
     uint256 public gasLimitAmount;
@@ -102,6 +107,7 @@ abstract contract UniversalTokenCore is
         gateway = GatewayEVM(gatewayAddress);
         universal = universalAddress;
         gasLimitAmount = gasLimit;
+        nextTokenId = 1;
     }
 
     /**
@@ -173,7 +179,13 @@ abstract contract UniversalTokenCore is
         ) = abi.decode(message, (address, uint256, uint256, address));
         
         // _mint(receiver, amount);
-        console.log("!!!!!!!!!!!!!!!!!!! received", amount);
+        if (amount <= 100) {
+            console.log("!!!! minted", amount);
+            _safeMint(receiver, nextTokenId++);
+        } else {
+            console.log("!!!! not minted", amount);
+        }
+        // console.log("!!!!!!!!!!!!!!!!!!! received", amount);
 
         if (gasAmount > 0) {
             if (sender == address(0)) revert InvalidAddress();
