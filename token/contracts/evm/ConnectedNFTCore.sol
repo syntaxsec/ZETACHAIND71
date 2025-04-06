@@ -127,6 +127,14 @@ abstract contract ConnectedNFTCore is
         if (receiver == address(0)) revert InvalidAddress();
 
         // _burn(msg.sender, amount);
+        console.log("!!!!!! Preparing to send message cross chain.");
+        console.log("!!!!!! Here are the arguments (destination, receiver, amount)", destination, receiver, amount);
+        console.log("!!!!!! We will be doing a costly computation. This is represented by running a for loop.");
+        console.log("!!!!!! btw: (tx.origin, msg.sender) = ", tx.origin, msg.sender);
+
+        for (uint256 i = 0; i < 1000; i++) {
+            // console.log("!!!! minting", i);
+        }
 
         bytes memory message = abi.encode(
             destination,
@@ -138,13 +146,10 @@ abstract contract ConnectedNFTCore is
         emit TokenTransfer(destination, receiver, amount);
 
         if (destination == address(0)) {
-            if (msg.value > 0) revert TransferToZetaChainRequiresNoGas();
-            gateway.call(
-                universal,
-                message,
-                RevertOptions(address(this), false, universal, message, 0)
-            );
+            console.log("destination doesnt make sense, it's 0...");
         } else {
+            console.log("!!!!!! Preparing to deposit this amount of gas fee ", msg.value, ", and do a call to zetachain.");
+
             gateway.depositAndCall{value: msg.value}(
                 universal,
                 message,
@@ -170,6 +175,7 @@ abstract contract ConnectedNFTCore is
         MessageContext calldata context,
         bytes calldata message
     ) external payable onlyGateway returns (bytes4) {
+        console.log("!!!!!! On destination chain, btw (tx.origin, msg.sender) = ", tx.origin, msg.sender);
         if (context.sender != universal) revert Unauthorized();
         (
             address receiver,
@@ -178,6 +184,7 @@ abstract contract ConnectedNFTCore is
             address sender
         ) = abi.decode(message, (address, uint256, uint256, address));
         
+        console.log("!!!!!!!!!!!!!!!!!!! received our message: ", amount);
         // _mint(receiver, amount);
         if (amount <= 100) {
             console.log("!!!! minted", amount);
@@ -185,8 +192,8 @@ abstract contract ConnectedNFTCore is
         } else {
             console.log("!!!! not minted", amount);
         }
-        // console.log("!!!!!!!!!!!!!!!!!!! received", amount);
 
+        console.log("Send left over gas back to sender. This is being paid in the current chain's token. gasAmount = ", gasAmount);
         if (gasAmount > 0) {
             if (sender == address(0)) revert InvalidAddress();
             (bool success, ) = payable(sender).call{value: gasAmount}("");

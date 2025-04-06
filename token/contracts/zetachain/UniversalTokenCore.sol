@@ -200,6 +200,7 @@ abstract contract UniversalTokenCore is
         uint256 amount,
         bytes calldata message
     ) external override onlyGateway {
+        console.log("!!!!!! Received on zetachain!");
         if (context.sender != connected[zrc20]) revert Unauthorized();
         (
             address destination,
@@ -207,14 +208,24 @@ abstract contract UniversalTokenCore is
             uint256 tokenAmount,
             address sender
         ) = abi.decode(message, (address, address, uint256, address));
+        console.log("!!!!!! Arguments are: (receiver, tokenAmount, sender) = ", receiver, tokenAmount, sender);
+        console.log("!!!!!! btw: (tx.origin, msg.sender) = ", tx.origin, msg.sender);
+
 
         if (destination == address(0)) {
             // _mint(receiver, tokenAmount);
+            console.log("!!!!!! We're on the destination chain (zetachain). This isn't intended for forwarding purposes");
             
         } else {
+            console.log("!!!!!! Prepare to get gas fees");
             (address gasZRC20, uint256 gasFee) = IZRC20(destination)
                 .withdrawGasFeeWithGasLimit(gasLimitAmount);
+            console.log("!!!!!! what we get: (gasZRC20, gasFee) = ", gasZRC20, gasFee, " (gasZRC20 is our destination zrc20 token address)");
+            
             if (destination != gasZRC20) revert InvalidAddress();
+
+            console.log("!!!!!! preparing to uniswap");
+            console.log("!!!!!! we're swapping 'amount' of 'zrc20' to 'targetZRC20', where (zrc20, amount, targetZRC20) = ", zrc20, amount, destination);
             uint256 out = SwapHelperLib.swapExactTokensForTokens(
                 uniswapRouter,
                 zrc20,
@@ -222,9 +233,14 @@ abstract contract UniversalTokenCore is
                 destination,
                 0
             );
+            console.log("!!!!!! Got 'targetZRC20' amount ", out);
+            console.log("!!!!!! approving the gateway to spend the tokens on our behalf");
+
             if (!IZRC20(destination).approve(address(gateway), out)) {
                 revert ApproveFailed();
             }
+            console.log("!!!!!! Preparing to withdraw and call. This will call the connected chain.");
+
             gateway.withdrawAndCall(
                 abi.encodePacked(connected[destination]),
                 out - gasFee,
