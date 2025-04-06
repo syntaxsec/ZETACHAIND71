@@ -14,7 +14,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 // Import the Universal Token core contract
-import "./UniversalTokenCore.sol";
+import "./UniversalCore.sol";
 
 contract UniversalToken is
     Initializable,
@@ -24,7 +24,7 @@ contract UniversalToken is
     // PausableUpgradeable,
     OwnableUpgradeable,
     // UUPSUpgradeable,
-    UniversalTokenCore // Inherit the Universal Token core contract
+    UniversalCore // Inherit the Universal Token core contract
 {
     /// @custom:oz-upgrades-unsafe-allow constructor
     // constructor() {
@@ -42,7 +42,7 @@ contract UniversalToken is
     initializer 
     {
         __Ownable_init(initialOwner);
-        __UniversalTokenCore_init(gatewayAddress, gas, uniswapRouterAddress); // Initialize the Universal Token core contract
+        __UniversalCore_init(gatewayAddress, gas, uniswapRouterAddress); // Initialize the Universal Token core contract
     }
 
     receive() external payable {}

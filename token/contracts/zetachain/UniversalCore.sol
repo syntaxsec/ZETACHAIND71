@@ -13,14 +13,14 @@ import {console} from "hardhat/console.sol";
 import "../shared/UniversalTokenEvents.sol";
 
 /**
- * @title UniversalTokenCore
+ * @title UniversalCore
  * @dev This abstract contract provides the core logic for Universal Tokens. It is designed
  *      to be imported into an OpenZeppelin-based ERC20 implementation, extending its
  *      functionality with cross-chain token transfer capabilities via GatewayZEVM. This
  *      contract facilitates cross-chain token transfers to and from ZetaChain and other
  *      connected EVM-based networks.
  */
-abstract contract UniversalTokenCore is
+abstract contract UniversalCore is
     UniversalContract,
     // ERC20Upgradeable,
     OwnableUpgradeable,
@@ -71,7 +71,7 @@ abstract contract UniversalTokenCore is
      * @param gasLimit Gas limit for cross-chain calls.
      * @param uniswapRouterAddress Address of the Uniswap router contract.
      */
-    function __UniversalTokenCore_init(
+    function __UniversalCore_init(
         address gatewayAddress,
         uint256 gasLimit,
         address uniswapRouterAddress

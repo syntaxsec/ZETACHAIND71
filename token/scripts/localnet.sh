@@ -29,7 +29,7 @@ GATEWAY_BNB=$(jq -r '.addresses[] | select(.type=="gatewayEVM" and .chain=="bnb"
 UNISWAP_ROUTER=$(jq -r '.addresses[] | select(.type=="uniswapRouterInstance" and .chain=="zetachain") | .address' localnet.json)
 SENDER=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 
-CONTRACT_ZETACHAIN=$(npx hardhat token:deploy --name ZetaChainUniversalToken --network localhost --gateway "$GATEWAY_ZETACHAIN" --uniswap-router "$UNISWAP_ROUTER" --json | jq -r '.contractAddress')
+CONTRACT_ZETACHAIN=$(npx hardhat token:deploy --name ZetaChainUniversal --network localhost --gateway "$GATEWAY_ZETACHAIN" --uniswap-router "$UNISWAP_ROUTER" --json | jq -r '.contractAddress')
 echo -e "\n🚀 Deployed contract on ZetaChain: $CONTRACT_ZETACHAIN"
 
 CONTRACT_ETHEREUM=$(npx hardhat token:deploy --name EVMConnectedNFT --json --network localhost --gateway "$GATEWAY_ETHEREUM" | jq -r '.contractAddress')
@@ -61,8 +61,11 @@ npx hardhat localnet-check
 # npx hardhat localnet-check
 # balance
 
-echo -e "\nTransferring the uint256 10 from: Ethereum → BNB..."
-npx hardhat token:transfer --network localhost --json --amount 10 --from "$CONTRACT_ETHEREUM" --to "$ZRC20_BNB" --gas-amount 1
+# echo -e "\nTransferring the uint256 10 from: Ethereum → BNB..."
+# npx hardhat token:transfer --network localhost --json --amount 10 --from "$CONTRACT_ETHEREUM" --to "$ZRC20_BNB" --gas-amount 1
+
+echo -e "\nTransferring message from: BNB → Ethereum. Input is 10."
+npx hardhat token:transfer --network localhost --json --amount 10 --from "$CONTRACT_BNB" --to "$ZRC20_ETHEREUM" --gas-amount 1
 
 npx hardhat localnet-check
 # balance
