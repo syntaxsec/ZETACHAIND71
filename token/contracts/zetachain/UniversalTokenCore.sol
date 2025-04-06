@@ -22,7 +22,7 @@ import "../shared/UniversalTokenEvents.sol";
  */
 abstract contract UniversalTokenCore is
     UniversalContract,
-    ERC20Upgradeable,
+    // ERC20Upgradeable,
     OwnableUpgradeable,
     UniversalTokenEvents
 {
@@ -252,7 +252,7 @@ abstract contract UniversalTokenCore is
             context.revertMessage,
             (address, uint256, address)
         );
-        _mint(sender, amount);
+        // _mint(sender, amount);
         emit TokenTransferReverted(
             sender,
             amount,
@@ -260,11 +260,11 @@ abstract contract UniversalTokenCore is
             context.amount
         );
 
-        if (context.amount > 0 && context.asset != address(0)) {
-            if (!IZRC20(context.asset).transfer(sender, context.amount)) {
-                revert TokenRefundFailed();
-            }
-        }
+        // if (context.amount > 0 && context.asset != address(0)) {
+        //     if (!IZRC20(context.asset).transfer(sender, context.amount)) {
+        //         revert TokenRefundFailed();
+        //     }
+        // }
     }
 
     function onAbort(AbortContext calldata context) external onlyGateway {
@@ -272,7 +272,7 @@ abstract contract UniversalTokenCore is
             context.revertMessage,
             (address, uint256, address)
         );
-        _mint(sender, amount);
+        // _mint(sender, amount);
         emit TokenTransferAborted(
             sender,
             amount,
@@ -280,10 +280,10 @@ abstract contract UniversalTokenCore is
             context.amount
         );
 
-        if (context.amount > 0 && context.asset != address(0)) {
-            if (!IZRC20(context.asset).transfer(sender, context.amount)) {
-                revert TokenRefundFailed();
-            }
-        }
+        // if (context.amount > 0 && context.asset != address(0)) {
+        //     if (!IZRC20(context.asset).transfer(sender, context.amount)) {
+        //         revert TokenRefundFailed();
+        //     }
+        // }
     }
 }

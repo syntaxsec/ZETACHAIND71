@@ -47,7 +47,7 @@ npx hardhat token:set-connected --network localhost --contract "$CONTRACT_ZETACH
 npx hardhat token:set-connected --network localhost --contract "$CONTRACT_ZETACHAIN" --connected "$CONTRACT_BNB" --zrc20 "$ZRC20_BNB" --json &>/dev/null
 
 npx hardhat localnet-check
-# balance
+balance
 
 # TOKEN=$(npx hardhat token:mint --network localhost --json --contract "$CONTRACT_ZETACHAIN" --to "$SENDER" --amount 10 | jq -r '.contractAddress')
 # echo -e "\nMinted tokens: $TOKEN on ZetaChain."
@@ -55,22 +55,22 @@ npx hardhat localnet-check
 # npx hardhat localnet-check
 # balance
 
-# echo -e "\nTransferring token: ZetaChain → Ethereum..."
-# npx hardhat token:transfer --network localhost --json --amount 10 --from "$CONTRACT_ZETACHAIN" --to "$ZRC20_ETHEREUM" --gas-amount 1
+echo -e "\nTransferring token: ZetaChain → Ethereum..."
+npx hardhat token:transfer --network localhost --json --amount 10 --from "$CONTRACT_ZETACHAIN" --to "$ZRC20_ETHEREUM" --gas-amount 1
 
-# npx hardhat localnet-check
-# balance
+npx hardhat localnet-check
+balance
 
-echo -e "\nTransferring the uint256 10 from: Ethereum → BNB..."
+echo -e "\nTransferring token: Ethereum → BNB..."
 npx hardhat token:transfer --network localhost --json --amount 10 --from "$CONTRACT_ETHEREUM" --to "$ZRC20_BNB" --gas-amount 1
 
 npx hardhat localnet-check
-# balance
+balance
 
-# echo -e "\nTransferring token: BNB → ZetaChain..."
-# npx hardhat token:transfer --network localhost --json --amount 10 --from "$CONTRACT_BNB"
+echo -e "\nTransferring token: BNB → ZetaChain..."
+npx hardhat token:transfer --network localhost --json --amount 10 --from "$CONTRACT_BNB"
 
-# npx hardhat localnet-check
-# balance
+npx hardhat localnet-check
+balance
 
 npx hardhat localnet-stop

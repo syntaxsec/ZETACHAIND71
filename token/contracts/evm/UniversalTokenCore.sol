@@ -17,7 +17,7 @@ import "../shared/UniversalTokenEvents.sol";
  *      It's important to set the universal contract address before making cross-chain transfers.
  */
 abstract contract UniversalTokenCore is
-    ERC20Upgradeable,
+    // ERC20Upgradeable,
     OwnableUpgradeable,
     UniversalTokenEvents
 {
@@ -52,7 +52,9 @@ abstract contract UniversalTokenCore is
      * @dev Can only be called by the contract owner.
      * @param gas New gas limit value.
      */
-    function setGasLimit(uint256 gas) external onlyOwner {
+    function setGasLimit(uint256 gas) external 
+    // onlyOwner 
+    {
         if (gas == 0) revert InvalidGasLimit();
         gasLimitAmount = gas;
     }
@@ -62,7 +64,9 @@ abstract contract UniversalTokenCore is
      * @dev Can only be called by the contract owner.
      * @param contractAddress The address of the universal contract.
      */
-    function setUniversal(address contractAddress) external onlyOwner {
+    function setUniversal(address contractAddress) external 
+    // onlyOwner 
+    {
         if (contractAddress == address(0)) revert InvalidAddress();
         universal = contractAddress;
         emit SetUniversal(contractAddress);
@@ -73,7 +77,9 @@ abstract contract UniversalTokenCore is
      * @dev Can only be called by the contract owner.
      * @param gatewayAddress The address of the gateway contract.
      */
-    function setGateway(address gatewayAddress) external onlyOwner {
+    function setGateway(address gatewayAddress) external 
+    // onlyOwner 
+    {
         if (gatewayAddress == address(0)) revert InvalidAddress();
         gateway = GatewayEVM(gatewayAddress);
     }
@@ -167,7 +173,7 @@ abstract contract UniversalTokenCore is
         ) = abi.decode(message, (address, uint256, uint256, address));
         
         // _mint(receiver, amount);
-        console.log("!!!!! received", amount);
+        console.log("!!!!!!!!!!!!!!!!!!! received", amount);
 
         if (gasAmount > 0) {
             if (sender == address(0)) revert InvalidAddress();
@@ -188,11 +194,11 @@ abstract contract UniversalTokenCore is
             context.revertMessage,
             (uint256, address)
         );
-        _mint(sender, amount);
-        if (context.amount > 0) {
-            (bool success, ) = payable(sender).call{value: context.amount}("");
-            if (!success) revert GasTokenRefundFailed();
-        }
+        // _mint(sender, amount);
+        // if (context.amount > 0) {
+        //     (bool success, ) = payable(sender).call{value: context.amount}("");
+        //     if (!success) revert GasTokenRefundFailed();
+        // }
         emit TokenTransferReverted(
             sender,
             amount,
