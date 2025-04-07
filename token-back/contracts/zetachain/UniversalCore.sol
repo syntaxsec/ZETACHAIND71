@@ -192,7 +192,7 @@ abstract contract UniversalCore is
 
     struct Msg {
         uint16 amount;
-        uint16 isResult;
+        bool isResult;
     }
 
     /**
@@ -221,8 +221,8 @@ abstract contract UniversalCore is
             Msg memory mymsg,
             address sender
         ) = abi.decode(message, (address, address, Msg, address));
-        console.log("!!!!!! Arguments are: (receiver, tokenAmount, sender) = ", receiver, mymsg.amount, sender);
-        console.log("!!!!!! btw: (tx.origin, msg.sender) = ", tx.origin, msg.sender);
+        // console.log("!!!!!! Arguments are: (receiver, tokenAmount, sender) = ", receiver, mymsg.amount, sender);
+        // console.log("!!!!!! btw: (tx.origin, msg.sender) = ", tx.origin, msg.sender);
 
 
         if (destination == address(0)) {
@@ -230,15 +230,15 @@ abstract contract UniversalCore is
             console.log("!!!!!! We're on the destination chain (zetachain). This isn't intended for forwarding purposes");
             
         } else {
-            console.log("!!!!!! Prepare to get gas fees");
+            // console.log("!!!!!! Prepare to get gas fees");
             (address gasZRC20, uint256 gasFee) = IZRC20(destination)
                 .withdrawGasFeeWithGasLimit(gasLimitAmount);
-            console.log("!!!!!! what we get: (gasZRC20, gasFee) = ", gasZRC20, gasFee, " (gasZRC20 is our destination zrc20 token address)");
+            // console.log("!!!!!! what we get: (gasZRC20, gasFee) = ", gasZRC20, gasFee, " (gasZRC20 is our destination zrc20 token address)");
             
             if (destination != gasZRC20) revert InvalidAddress();
 
-            console.log("!!!!!! preparing to uniswap");
-            console.log("!!!!!! we're swapping 'amount' of 'zrc20' to 'targetZRC20', where (zrc20, amount, targetZRC20) = ", zrc20, amount, destination);
+            // console.log("!!!!!! preparing to uniswap");
+            // console.log("!!!!!! we're swapping 'amount' of 'zrc20' to 'targetZRC20', where (zrc20, amount, targetZRC20) = ", zrc20, amount, destination);
             uint256 out = SwapHelperLib.swapExactTokensForTokens(
                 uniswapRouter,
                 zrc20,
@@ -246,15 +246,14 @@ abstract contract UniversalCore is
                 destination,
                 0
             );
-            console.log("!!!!!! Got 'targetZRC20' amount ", out);
-            console.log("!!!!!! approving the gateway to spend the tokens on our behalf");
+            // console.log("!!!!!! Got 'targetZRC20' amount ", out);
+            // console.log("!!!!!! approving the gateway to spend the tokens on our behalf");
 
             if (!IZRC20(destination).approve(address(gateway), out)) {
                 revert ApproveFailed();
             }
-            console.log("!!!!!! Preparing to withdraw and call. This will call the connected chain.");
-            // mymsg.amount = uint16(out - gasFee);
-
+            // console.log("!!!!!! Preparing to withdraw and call. This will call the connected chain.");
+            console.log("!!!!!! Zetachain -> Connected Chain.");
             gateway.withdrawAndCall(
                 abi.encodePacked(connected[destination]),
                 out - gasFee,
@@ -282,7 +281,6 @@ abstract contract UniversalCore is
             context.revertMessage,
             (address, uint256, address)
         );
-        // _mint(sender, amount);
         emit TokenTransferReverted(
             sender,
             amount,

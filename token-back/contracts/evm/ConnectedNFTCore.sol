@@ -112,7 +112,7 @@ abstract contract ConnectedNFTCore is
 
     struct Msg {
         uint16 amount;
-        uint16 isResult;
+        bool isResult;
     }
 
     /**
@@ -131,20 +131,21 @@ abstract contract ConnectedNFTCore is
     ) external payable {
         if (receiver == address(0)) revert InvalidAddress();
 
-        // _burn(msg.sender, amount);
-        console.log("!!!!!! Preparing to send message cross chain.");
-        console.log("!!!!!! Here are the arguments (destination, receiver, amount)", destination, receiver, amount);
+        console.log("!!!!!! Prepare: Connected -> ZetaChain");
+        // console.log("!!!!!! Here are the arguments (destination, receiver, amount)", destination, receiver, amount);
         console.log("!!!!!! We will be doing a costly computation. This is represented by running a for loop.");
-        console.log("!!!!!! btw: (tx.origin, msg.sender) = ", tx.origin, msg.sender);
+        // console.log("!!!!!! btw: (tx.origin, msg.sender) = ", tx.origin, msg.sender);
 
+        uint256 x = 0;
         for (uint256 i = 0; i < 1000; i++) {
-            // console.log("!!!! minting", i);
+            x += i;
         }
 
+        console.log("!!!!!! Here instead of sending the amount, we send a struct that contains amount and a boolean isResult. It's default to false and only true when we are sending back the result.");
         bytes memory message = abi.encode(
             destination,
             receiver,
-            Msg(uint16(amount), uint16(0)),
+            Msg(uint16(amount), false),
             msg.sender
         );
 
@@ -176,20 +177,12 @@ abstract contract ConnectedNFTCore is
     ) external payable {
         if (receiver == address(0)) revert InvalidAddress();
 
-        // _burn(msg.sender, amount);
-        console.log("!!!!!! Preparing to send message cross chain.");
-        console.log("!!!!!! Here are the arguments (destination, receiver, amount)", destination, receiver, amount);
-        // console.log("!!!!!! We will be doing a costly computation. This is represented by running a for loop.");
-        console.log("!!!!!! btw: (tx.origin, msg.sender) = ", tx.origin, msg.sender);
-
-        // for (uint256 i = 0; i < 1000; i++) {
-        //     // console.log("!!!! minting", i);
-        // }
+        console.log("!!!!!! Preparing to send message cross chain, the second time.");
 
         bytes memory message = abi.encode(
             destination,
             receiver,
-            Msg(uint16(0),uint16(1)),
+            Msg(uint16(0), true),
             msg.sender
         );
 
@@ -198,7 +191,7 @@ abstract contract ConnectedNFTCore is
         if (destination == address(0)) {
             console.log("destination doesnt make sense, it's 0...");
         } else {
-            console.log("!!!!!! Preparing to deposit this amount of gas fee ", msg.value, ", and do a call to zetachain.");
+            console.log("!!!!!! Preparing to deposit this amount of gas fee ", amount, ", and do a call to zetachain.");
 
             gateway.depositAndCall{value: amount}(
                 universal,
@@ -225,7 +218,8 @@ abstract contract ConnectedNFTCore is
         MessageContext calldata context,
         bytes calldata message
     ) external payable onlyGateway returns (bytes4) {
-        console.log("!!!!!! On destination chain, btw (tx.origin, msg.sender) = ", tx.origin, msg.sender);
+        console.log("!!!!!! On destination chain");
+        // console.log("!!!!!! btw (tx.origin, msg.sender) = ", tx.origin, msg.sender);
         if (context.sender != universal) revert Unauthorized();
         (
             address receiver,
@@ -234,22 +228,17 @@ abstract contract ConnectedNFTCore is
             address sender
         ) = abi.decode(message, (address, Msg, uint256, address));
         
-        console.log("!!!!!!!!!!!!!!!!!!! received our message: ", mymsg.amount, mymsg.isResult);
-        if (mymsg.isResult < 1) {
+        if (!mymsg.isResult) {
             if (mymsg.amount <= 100) {
-                console.log("!!!! minted", mymsg.amount);
+                console.log("!!!!! minted because 100 >= ", mymsg.amount);
                 _safeMint(receiver, nextTokenId++);
             } else {
-                console.log("!!!! not minted", mymsg.amount);
+                console.log("!!!!! not minted because 100 < ", mymsg.amount);
             }
-            mymsg.isResult = 1;
-            // console.log("Send left over gas back to sender. This is being paid in the current chain's token. gasAmount = ", gasAmount);
-            // if (gasAmount > 0) {
-            //     if (sender == address(0)) revert InvalidAddress();
-            //     (bool success, ) = payable(sender).call{value: gasAmount}("");
-            //     if (!success) revert GasTokenTransferFailed();
-            // }
-            console.log("sending with arguments (tx.origin, sender) = ", tx.origin, sender);
+            mymsg.isResult = true;
+            // console.log("sending with arguments (tx.origin, sender) = ", tx.origin, sender);
+            console.log("!!!!! Connected -> Zetachain. Instead of transferring the remaining gas fees to the sender, we use this as the gas fee to send the result back.");
+
             this.transferCrossChain2(
                 0x91d18e54DAf4F677cB28167158d6dd21F6aB3921,
                 tx.origin,
@@ -258,10 +247,10 @@ abstract contract ConnectedNFTCore is
             return "";
             
         } else {
-            console.log("!!!!!! ????? !!!!! Our result is back!!!");
+            console.log("!!!!! We arrived on the Connected chain with the result. This is the end of our trip :)");
         }
         
-        console.log("Send left over gas back to sender. This is being paid in the current chain's token. gasAmount = ", gasAmount);
+        console.log("!!!!! Send left over gas back to sender. This is being paid in the current chain's token. gasAmount = ", gasAmount);
         if (gasAmount > 0) {
             if (sender == address(0)) revert InvalidAddress();
             (bool success, ) = payable(sender).call{value: gasAmount}("");
