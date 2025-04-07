@@ -39,7 +39,7 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
 };
 
 export const tokenSetUniversal = task(
-  "token:set-universal",
+  "msg:set-universal",
   "Sets the universal contract address",
   main
 )

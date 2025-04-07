@@ -8,29 +8,29 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {console} from "hardhat/console.sol";
 import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
-import "../shared/UniversalTokenEvents.sol";
+import "../shared/CrossChainMessageEvents.sol";
 
 /**
- * @title UniversalTokenCore
- * @dev This abstract contract provides the core logic for Universal Tokens. It is designed
- *      to be imported into an OpenZeppelin-based ERC20 implementation, extending its
+ * @title UniversalNFTCore
+ * @dev This abstract contract provides the core logic for Connected NFT Tokens. It is designed
+ *      to be imported into an OpenZeppelin-based ERC721 implementation, extending its
  *      functionality with cross-chain token transfer capabilities via GatewayEVM. This
- *      contract facilitates cross-chain token transfers to and from EVM-based networks.
- *      It's important to set the universal contract address before making cross-chain transfers.
+ *      contract facilitates cross-chain message transfers to and from EVM-based networks, and
+ *      minting of NFTs based on the transferred message. It's important to set the universal 
+ *      contract address before making cross-chain transfers.
  */
 abstract contract ConnectedNFTCore is
     // ERC20Upgradeable,
     ERC721Upgradeable,
 
     OwnableUpgradeable,
-    UniversalTokenEvents
+    CrossChainMessageEvents
 {
     // Address of the EVM gateway contract
     GatewayEVM public gateway;
 
-    // The address of the Universal Token contract on ZetaChain. This contract serves
-    // as a key component for handling all cross-chain transfers while also functioning
-    // as an ERC-20 Universal Token.
+    // The address of the Universal contract on ZetaChain. This contract serves
+    // as a key component for handling all cross-chain transfers.
     address public universal;
     uint256 public nextTokenId;
 
@@ -58,7 +58,7 @@ abstract contract ConnectedNFTCore is
      * @param gas New gas limit value.
      */
     function setGasLimit(uint256 gas) external 
-    // onlyOwner 
+    onlyOwner 
     {
         if (gas == 0) revert InvalidGasLimit();
         gasLimitAmount = gas;
@@ -70,7 +70,7 @@ abstract contract ConnectedNFTCore is
      * @param contractAddress The address of the universal contract.
      */
     function setUniversal(address contractAddress) external 
-    // onlyOwner 
+    onlyOwner 
     {
         if (contractAddress == address(0)) revert InvalidAddress();
         universal = contractAddress;
@@ -83,7 +83,7 @@ abstract contract ConnectedNFTCore is
      * @param gatewayAddress The address of the gateway contract.
      */
     function setGateway(address gatewayAddress) external 
-    // onlyOwner 
+    onlyOwner 
     {
         if (gatewayAddress == address(0)) revert InvalidAddress();
         gateway = GatewayEVM(gatewayAddress);
@@ -96,7 +96,7 @@ abstract contract ConnectedNFTCore is
      * @param universalAddress The address of the universal contract.
      * @param gasLimit The gas limit to set.
      */
-    function __UniversalTokenCore_init(
+    function __UniversalCore_init(
         address gatewayAddress,
         address universalAddress,
         uint256 gasLimit
@@ -111,13 +111,11 @@ abstract contract ConnectedNFTCore is
     }
 
     /**
-     * @notice Transfers tokens to another chain.
-     * @dev Burns the tokens locally, then uses the Gateway to send a message to
-     *      mint the same tokens on the destination chain. If the destination is the zero
-     *      address, transfers the tokens to ZetaChain.
+     * @notice Transfers message to another chain.
+     * @dev Does a costly computation and pass the result to zetachain.
      * @param destination The ZRC-20 address of the gas token of the destination chain.
      * @param receiver The address on the destination chain that will receive the tokens.
-     * @param amount The amount of tokens to transfer.
+     * @param amount Our input.
      */
     function transferCrossChain(
         address destination,
@@ -126,14 +124,14 @@ abstract contract ConnectedNFTCore is
     ) external payable {
         if (receiver == address(0)) revert InvalidAddress();
 
-        // _burn(msg.sender, amount);
         console.log("!!!!!! Preparing to send message cross chain.");
         console.log("!!!!!! Here are the arguments (destination, receiver, amount)", destination, receiver, amount);
         console.log("!!!!!! We will be doing a costly computation. This is represented by running a for loop.");
         console.log("!!!!!! btw: (tx.origin, msg.sender) = ", tx.origin, msg.sender);
 
+        uint256 x = 0;
         for (uint256 i = 0; i < 1000; i++) {
-            // console.log("!!!! minting", i);
+            x += i;
         }
 
         bytes memory message = abi.encode(
@@ -143,7 +141,7 @@ abstract contract ConnectedNFTCore is
             msg.sender
         );
 
-        emit TokenTransfer(destination, receiver, amount);
+        emit MessageTransfer(destination, receiver, amount);
 
         if (destination == address(0)) {
             console.log("destination doesnt make sense, it's 0...");
@@ -165,7 +163,7 @@ abstract contract ConnectedNFTCore is
     }
 
     /**
-     * @notice Mints tokens in response to an incoming cross-chain transfer.
+     * @notice Mints NFTs in response to an incoming cross-chain message.
      * @dev Called by the Gateway upon receiving a message.
      * @param context The message context.
      * @param message The encoded message containing information about the tokens.
@@ -175,7 +173,6 @@ abstract contract ConnectedNFTCore is
         MessageContext calldata context,
         bytes calldata message
     ) external payable onlyGateway returns (bytes4) {
-        console.log("!!!!!! On destination chain, btw (tx.origin, msg.sender) = ", tx.origin, msg.sender);
         if (context.sender != universal) revert Unauthorized();
         (
             address receiver,
@@ -183,28 +180,26 @@ abstract contract ConnectedNFTCore is
             uint256 gasAmount,
             address sender
         ) = abi.decode(message, (address, uint256, uint256, address));
-        
-        console.log("!!!!!!!!!!!!!!!!!!! received our message: ", amount);
-        // _mint(receiver, amount);
+        console.log("!!!!!! On destination chain, btw (tx.origin, msg.sender, sender) = ", tx.origin, msg.sender, sender);
         if (amount <= 100) {
-            console.log("!!!! minted", amount);
+            console.log("!!!! minted because 100 >= ", amount);
             _safeMint(receiver, nextTokenId++);
         } else {
-            console.log("!!!! not minted", amount);
+            console.log("!!!! not minted because 100 <", amount);
         }
 
-        console.log("Send left over gas back to sender. This is being paid in the current chain's token. gasAmount = ", gasAmount);
+        console.log("!!!!! Send left over gas back to sender. This is being paid in the current chain's token. gasAmount = ", gasAmount);
         if (gasAmount > 0) {
             if (sender == address(0)) revert InvalidAddress();
             (bool success, ) = payable(sender).call{value: gasAmount}("");
             if (!success) revert GasTokenTransferFailed();
         }
-        emit TokenTransferReceived(receiver, amount);
+        emit MessageTransferReceived(receiver, amount);
         return "";
     }
 
     /**
-     * @notice Mints tokens and sends them back to the sender if a cross-chain transfer fails.
+     * @notice Emits an event when a cross-chain transfer is reverted.
      * @dev Called by the Gateway if a call fails.
      * @param context The revert context containing metadata and revert message.
      */
@@ -213,12 +208,8 @@ abstract contract ConnectedNFTCore is
             context.revertMessage,
             (uint256, address)
         );
-        // _mint(sender, amount);
-        // if (context.amount > 0) {
-        //     (bool success, ) = payable(sender).call{value: context.amount}("");
-        //     if (!success) revert GasTokenRefundFailed();
-        // }
-        emit TokenTransferReverted(
+
+        emit MessageTransferReverted(
             sender,
             amount,
             address(0), // gas token

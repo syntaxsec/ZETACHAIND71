@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@zetachain/protocol-contracts/contracts/zevm/interfaces/UniversalContract.sol";
 import "@zetachain/protocol-contracts/contracts/zevm/interfaces/IGatewayZEVM.sol";
@@ -10,21 +9,17 @@ import "@zetachain/protocol-contracts/contracts/zevm/GatewayZEVM.sol";
 import {SwapHelperLib} from "@zetachain/toolkit/contracts/SwapHelperLib.sol";
 import {console} from "hardhat/console.sol";
 
-import "../shared/UniversalTokenEvents.sol";
+import "../shared/CrossChainMessageEvents.sol";
 
 /**
  * @title UniversalCore
- * @dev This abstract contract provides the core logic for Universal Tokens. It is designed
- *      to be imported into an OpenZeppelin-based ERC20 implementation, extending its
- *      functionality with cross-chain token transfer capabilities via GatewayZEVM. This
- *      contract facilitates cross-chain token transfers to and from ZetaChain and other
+ * @dev This contract facilitates cross-chain message transfers to and from ZetaChain and other
  *      connected EVM-based networks.
  */
 abstract contract UniversalCore is
     UniversalContract,
-    // ERC20Upgradeable,
     OwnableUpgradeable,
-    UniversalTokenEvents
+    CrossChainMessageEvents
 {
     // Indicates this contract implements a Universal Contract
     bool public constant isUniversal = true;
@@ -127,9 +122,7 @@ abstract contract UniversalCore is
         if (msg.value == 0) revert ZeroMsgValue();
         if (receiver == address(0)) revert InvalidAddress();
 
-        // _burn(msg.sender, amount);
-
-        emit TokenTransfer(destination, receiver, amount);
+        emit MessageTransfer(destination, receiver, amount);
 
         (address gasZRC20, uint256 gasFee) = IZRC20(destination)
             .withdrawGasFeeWithGasLimit(gasLimitAmount);
@@ -183,15 +176,14 @@ abstract contract UniversalCore is
     }
 
     /**
-     * @notice Handles cross-chain token transfers.
+     * @notice Handles cross-chain message transfers.
      * @dev This function is called by the Gateway contract upon receiving a message.
-     *      If the destination is ZetaChain, mint tokens for the receiver.
+     *      If the destination is ZetaChain, do nothing.
      *      If the destination is another chain, swap the gas token for the corresponding
-     *      ZRC20 token and use the Gateway to send a message to transfer tokens to the
-     *      destination chain.
+     *      ZRC20 token and use the Gateway to send a message to the destination chain.
      * @param context Message context metadata.
      * @param zrc20 ZRC20 token address.
-     * @param amount Amount of token provided.
+     * @param amount We aren't using this
      * @param message Encoded payload containing token transfer metadata.
      */
     function onCall(
@@ -213,9 +205,7 @@ abstract contract UniversalCore is
 
 
         if (destination == address(0)) {
-            // _mint(receiver, tokenAmount);
             console.log("!!!!!! We're on the destination chain (zetachain). This isn't intended for forwarding purposes");
-            
         } else {
             console.log("!!!!!! Prepare to get gas fees");
             (address gasZRC20, uint256 gasFee) = IZRC20(destination)
@@ -256,7 +246,7 @@ abstract contract UniversalCore is
                 )
             );
         }
-        emit TokenTransferToDestination(destination, receiver, amount);
+        emit MessageTransferToDestination(destination, receiver, amount);
     }
 
     /**
@@ -269,18 +259,12 @@ abstract contract UniversalCore is
             (address, uint256, address)
         );
         // _mint(sender, amount);
-        emit TokenTransferReverted(
+        emit MessageTransferReverted(
             sender,
             amount,
             context.asset,
             context.amount
         );
-
-        // if (context.amount > 0 && context.asset != address(0)) {
-        //     if (!IZRC20(context.asset).transfer(sender, context.amount)) {
-        //         revert TokenRefundFailed();
-        //     }
-        // }
     }
 
     function onAbort(AbortContext calldata context) external onlyGateway {
@@ -289,17 +273,12 @@ abstract contract UniversalCore is
             (address, uint256, address)
         );
         // _mint(sender, amount);
-        emit TokenTransferAborted(
+        emit MessageTransferAborted(
             sender,
             amount,
             context.asset,
             context.amount
         );
 
-        // if (context.amount > 0 && context.asset != address(0)) {
-        //     if (!IZRC20(context.asset).transfer(sender, context.amount)) {
-        //         revert TokenRefundFailed();
-        //     }
-        // }
     }
 }

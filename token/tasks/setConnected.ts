@@ -46,7 +46,7 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
 };
 
 export const tokenSetConnected = task(
-  "token:set-connected",
+  "msg:set-connected",
   "Sets the connected contract address",
   main
 )

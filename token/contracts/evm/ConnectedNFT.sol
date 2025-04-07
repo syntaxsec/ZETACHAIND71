@@ -9,30 +9,26 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
-// Import the Universal Token core contract
+// Import the Universal NFT core contract
 import "./ConnectedNFTCore.sol";
 
 contract ConnectedNFT is
     Initializable,
     OwnableUpgradeable,
-    ConnectedNFTCore // Inherit the Universal Token core contract
+    ConnectedNFTCore // Inherit theUniversal NFT core contract
 {
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
 
     function initialize(
         address initialOwner,
         string memory name,
         string memory symbol,
         address payable gatewayAddress, // Include EVM gateway address
-        uint256 gas // Set gas limit for universal Token transfers
+        uint256 gas // Set gas limit forUniversal NFT transfers
     ) public 
     initializer 
     {
         __ERC721_init(name, symbol);
         __Ownable_init(initialOwner);
-        __UniversalTokenCore_init(gatewayAddress, address(this), gas); // Initialize the Universal Token core contract
+        __UniversalCore_init(gatewayAddress, address(this), gas); // Initialize theUniversal NFT core contract
     }
 }

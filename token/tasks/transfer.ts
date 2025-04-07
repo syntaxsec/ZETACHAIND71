@@ -55,8 +55,8 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-export const tokenTransfer = task(
-  "token:transfer",
+export const MessageTransfer = task(
+  "msg:transfer",
   "Transfer and lock an NFT",
   main
 )

@@ -13,36 +13,27 @@ import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Ini
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-// Import the Universal Token core contract
+// Import the Universal NFT core contract
 import "./UniversalCore.sol";
 
 contract UniversalToken is
     Initializable,
-    // ERC20Upgradeable,
-    // ERC20BurnableUpgradeable,
-    // ERC20PausableUpgradeable,
-    // PausableUpgradeable,
     OwnableUpgradeable,
-    // UUPSUpgradeable,
-    UniversalCore // Inherit the Universal Token core contract
+    UniversalCore // Inherit theUniversal NFT core contract
 {
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    // constructor() {
-    //     _disableInitializers();
-    // }
 
     function initialize(
         address initialOwner,
-        string memory name,
+        string memory name, // we're using the same deploy task for Universal.sol and ConnectedNFT.sol so we'll keep this here.
         string memory symbol,
         address payable gatewayAddress, // Include EVM gateway address
-        uint256 gas, // Set gas limit for universal Token transfers
+        uint256 gas, // Set gas limit forUniversal NFT transfers
         address uniswapRouterAddress // Uniswap v2 router address for gas token swaps
     ) public 
     initializer 
     {
         __Ownable_init(initialOwner);
-        __UniversalCore_init(gatewayAddress, gas, uniswapRouterAddress); // Initialize the Universal Token core contract
+        __UniversalCore_init(gatewayAddress, gas, uniswapRouterAddress); // Initialize theUniversal NFT core contract
     }
 
     receive() external payable {}

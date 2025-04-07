@@ -48,8 +48,8 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
 };
 
 export const tokenDeploy = task(
-  "token:deploy",
-  "Deploy a universal token contract",
+  "msg:deploy",
+  "Deploy aUniversal NFT contract",
   main
 )
   .addFlag("json", "Output the result in JSON format")
