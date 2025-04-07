@@ -167,6 +167,16 @@ abstract contract ConnectedNFTCore is
     ) external payable {
         if (receiver == address(0)) revert InvalidAddress();
 
+        console.log("!!!!!! On BNB");
+        console.log("!!!!!! Received request to do costly computation at cheap net with input ", result);
+
+        uint256 x = 0;
+        for (uint256 i = 0; i < 1000; i++) {
+            x += i;
+        }
+
+        console.log("!!!!!! Costly Operation finished. Will be sending back to Ethereum");
+
         console.log("!!!!!! Preparing to send message cross chain, the second time.");
         
 
@@ -219,15 +229,6 @@ abstract contract ConnectedNFTCore is
         
         // This is at the Cheap net (BNB)
         if (!mymsg.isResult) {
-            console.log("!!!!!! On BNB");
-            console.log("!!!!!! Received request to do costly computation at cheap net with input ", mymsg.amount);
-
-            uint256 x = 0;
-            for (uint256 i = 0; i < 1000; i++) {
-                x += i;
-            }
-
-            console.log("!!!!!! Costly Operation finished. Will be sending back to Ethereum");
             
             this.transferCrossChain2(
                 0x2ca7d64A7EFE2D62A725E2B35Cf7230D6677FfEe, // zrc20_ETH
