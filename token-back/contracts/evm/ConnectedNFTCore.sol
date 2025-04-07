@@ -129,15 +129,8 @@ abstract contract ConnectedNFTCore is
     ) external payable {
         if (receiver == address(0)) revert InvalidAddress();
 
-        console.log("!!!!!! Prepare: Connected -> ZetaChain");
-        console.log("!!!!!! We will be doing a costly computation. This is represented by running a for loop.");
-
-        uint256 x = 0;
-        for (uint256 i = 0; i < 1000; i++) {
-            x += i;
-        }
-
-        console.log("!!!!!! Here instead of sending the amount, we send a struct that contains amount and a boolean isResult. It's default to false and only true when we are sending back the result.");
+        console.log("!!!!!! Our goal is to off-load computational intensive tasks to the cheap chain (BNB)");
+        console.log("!!!!!! Sending from Ethereum -> ZetaChain.");
         bytes memory message = abi.encode(
             destination,
             receiver,
@@ -169,16 +162,18 @@ abstract contract ConnectedNFTCore is
     function transferCrossChain2(
         address destination,
         address receiver,
-        uint256 amount
+        uint256 amount,
+        uint16 result
     ) external payable {
         if (receiver == address(0)) revert InvalidAddress();
 
         console.log("!!!!!! Preparing to send message cross chain, the second time.");
+        
 
         bytes memory message = abi.encode(
             destination,
             receiver,
-            Msg(uint16(0), true),
+            Msg(result, true),
             msg.sender
         );
 
@@ -214,7 +209,6 @@ abstract contract ConnectedNFTCore is
         MessageContext calldata context,
         bytes calldata message
     ) external payable onlyGateway returns (bytes4) {
-        console.log("!!!!!! On destination chain");
         if (context.sender != universal) revert Unauthorized();
         (
             address receiver,
@@ -223,26 +217,38 @@ abstract contract ConnectedNFTCore is
             address sender
         ) = abi.decode(message, (address, Msg, uint256, address));
         
+        // This is at the Cheap net (BNB)
         if (!mymsg.isResult) {
-            if (mymsg.amount <= 100) {
-                console.log("!!!!! minted because 100 >= ", mymsg.amount);
-                _safeMint(receiver, nextTokenId++);
-            } else {
-                console.log("!!!!! not minted because 100 < ", mymsg.amount);
-            }
-            mymsg.isResult = true;
-            console.log("!!!!! Connected -> Zetachain. Instead of transferring the remaining gas fees to the sender, we use this as the gas fee to send the result back to the sender:", sender);
+            console.log("!!!!!! On BNB");
+            console.log("!!!!!! Received request to do costly computation at cheap net with input ", mymsg.amount);
 
+            uint256 x = 0;
+            for (uint256 i = 0; i < 1000; i++) {
+                x += i;
+            }
+
+            console.log("!!!!!! Costly Operation finished. Will be sending back to Ethereum");
+            
             this.transferCrossChain2(
-                0x91d18e54DAf4F677cB28167158d6dd21F6aB3921,
+                0x2ca7d64A7EFE2D62A725E2B35Cf7230D6677FfEe, // zrc20_ETH
                 sender,
-                gasAmount
+                gasAmount,
+                mymsg.amount
             );
             return "";
             
+        } 
+
+        // This is at the expensive chain (Ethereum)
+        console.log("!!!!! We arrived on the Expensive chain (Ethereum) with the result. This is the end of our trip :)");
+        if (mymsg.amount <= 100) {
+            console.log("!!!!! minted NFT with tokenId = ", nextTokenId, " because 100 >= ", mymsg.amount);
+            _safeMint(receiver, nextTokenId++);
         } else {
-            console.log("!!!!! We arrived on the Connected chain with the result. This is the end of our trip :)");
+            console.log("!!!!! not minted because 100 < ", mymsg.amount);
         }
+        mymsg.isResult = true;
+        
         
         console.log("!!!!! Send left over gas back to sender. This is being paid in the current chain's token. gasAmount = ", gasAmount);
         if (gasAmount > 0) {
