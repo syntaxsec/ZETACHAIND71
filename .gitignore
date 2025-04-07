@@ -1,8 +1,9 @@
-/node_modules
-/solana
-/sui
-/artifacts
-/typechain-types
-/cache
-/deployment-info.json
-/localnet.json
+/token/node_modules
+/token/artifacts
+/token/typechain-types
+/token/cache
+
+/token-back/node_modules
+/token-back/artifacts
+/token-back/typechain-types
+/token-back/cache
