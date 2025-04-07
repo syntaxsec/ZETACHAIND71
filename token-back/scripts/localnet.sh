@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-# set -x
 set -o pipefail
 
 # npx hardhat localnet --exit-on-error & sleep 15
