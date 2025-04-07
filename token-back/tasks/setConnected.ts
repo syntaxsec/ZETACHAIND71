@@ -1,6 +1,6 @@
 import { task } from "hardhat/config";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { ZetaChainUniversalToken } from "../typechain-types";
+import { ZetaChainUniversal } from "../typechain-types";
 
 const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
   const { isAddress } = hre.ethers.utils;
@@ -20,8 +20,8 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
     throw new Error("Invalid Ethereum address provided.");
   }
 
-  const contract: ZetaChainUniversalToken = await hre.ethers.getContractAt(
-    "ZetaChainUniversalToken",
+  const contract: ZetaChainUniversal = await hre.ethers.getContractAt(
+    "ZetaChainUniversal",
     args.contract
   );
 
@@ -46,7 +46,7 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
 };
 
 export const tokenSetConnected = task(
-  "token:set-connected",
+  "msg-back:set-connected",
   "Sets the connected contract address",
   main
 )

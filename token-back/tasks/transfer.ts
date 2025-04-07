@@ -17,7 +17,7 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
   };
 
   const contract = await ethers.getContractAt(
-    "ZetaChainUniversalToken",
+    "EVMConnectedNFT",
     args.from
   );
 
@@ -56,8 +56,8 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
 };
 
 export const tokenTransfer = task(
-  "token:transfer",
-  "Transfer and lock an NFT",
+  "msg-back:transfer",
+  "Transfer a message and conditionally mint an NFT",
   main
 )
   .addParam("from", "The contract being transferred from")

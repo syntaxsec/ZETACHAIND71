@@ -9,7 +9,7 @@ import "@zetachain/protocol-contracts/contracts/zevm/GatewayZEVM.sol";
 import {SwapHelperLib} from "@zetachain/toolkit/contracts/SwapHelperLib.sol";
 import {console} from "hardhat/console.sol";
 
-import "../shared/UniversalTokenEvents.sol";
+import "../shared/CrossChainMessagingEvents.sol";
 
 /**
  * @title UniversalCore
@@ -20,7 +20,7 @@ import "../shared/UniversalTokenEvents.sol";
 abstract contract UniversalCore is
     UniversalContract,
     OwnableUpgradeable,
-    UniversalTokenEvents
+    CrossChainMessagingEvents
 {
     // Indicates this contract implements a Universal Contract
     bool public constant isUniversal = true;
@@ -173,7 +173,7 @@ abstract contract UniversalCore is
                 )
             );
         }
-        emit TokenTransferToDestination(destination, receiver, amount);
+        emit MessageTransferToDestination(destination, receiver, amount);
     }
 
     /**
@@ -185,7 +185,7 @@ abstract contract UniversalCore is
             context.revertMessage,
             (address, uint256, address)
         );
-        emit TokenTransferReverted(
+        emit MessageTransferReverted(
             sender,
             amount,
             context.asset,
@@ -198,7 +198,7 @@ abstract contract UniversalCore is
             context.revertMessage,
             (address, uint256, address)
         );
-        emit TokenTransferAborted(
+        emit MessageTransferAborted(
             sender,
             amount,
             context.asset,

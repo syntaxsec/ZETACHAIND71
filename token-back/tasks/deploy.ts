@@ -48,7 +48,7 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
 };
 
 export const tokenDeploy = task(
-  "token:deploy",
+  "msg-back:deploy",
   "Deploy a universal token contract",
   main
 )
@@ -58,7 +58,7 @@ export const tokenDeploy = task(
   .addOptionalParam(
     "name",
     "The contract name to deploy",
-    "ZetaChainUniversalToken"
+    "ZetaChainUniversal"
   )
   .addOptionalParam(
     "gasLimit",

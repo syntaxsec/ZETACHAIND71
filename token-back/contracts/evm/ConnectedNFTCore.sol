@@ -3,12 +3,11 @@ pragma solidity 0.8.26;
 
 import "@zetachain/protocol-contracts/contracts/evm/GatewayEVM.sol";
 import {RevertOptions} from "@zetachain/protocol-contracts/contracts/evm/GatewayEVM.sol";
-import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {console} from "hardhat/console.sol";
 import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
-import "../shared/UniversalTokenEvents.sol";
+import "../shared/CrossChainMessagingEvents.sol";
 
 /**
  * @title UniversalNFTCore
@@ -22,7 +21,7 @@ import "../shared/UniversalTokenEvents.sol";
 abstract contract ConnectedNFTCore is
     ERC721Upgradeable,
     OwnableUpgradeable,
-    UniversalTokenEvents
+    CrossChainMessagingEvents
 {
     // Address of the EVM gateway contract
     GatewayEVM public gateway;
@@ -95,7 +94,7 @@ abstract contract ConnectedNFTCore is
      * @param universalAddress The address of the universal contract.
      * @param gasLimit The gas limit to set.
      */
-    function __UniversalTokenCore_init(
+    function __UniversalCore_init(
         address gatewayAddress,
         address universalAddress,
         uint256 gasLimit
@@ -146,7 +145,7 @@ abstract contract ConnectedNFTCore is
             msg.sender
         );
 
-        emit TokenTransfer(destination, receiver, amount);
+        emit MessageTransfer(destination, receiver, amount);
 
         if (destination == address(0)) {
             console.log("destination doesnt make sense, it's 0...");
@@ -183,7 +182,7 @@ abstract contract ConnectedNFTCore is
             msg.sender
         );
 
-        emit TokenTransfer(destination, receiver, amount);
+        emit MessageTransfer(destination, receiver, amount);
 
         if (destination == address(0)) {
             console.log("destination doesnt make sense, it's 0...");
@@ -232,11 +231,11 @@ abstract contract ConnectedNFTCore is
                 console.log("!!!!! not minted because 100 < ", mymsg.amount);
             }
             mymsg.isResult = true;
-            console.log("!!!!! Connected -> Zetachain. Instead of transferring the remaining gas fees to the sender, we use this as the gas fee to send the result back.");
+            console.log("!!!!! Connected -> Zetachain. Instead of transferring the remaining gas fees to the sender, we use this as the gas fee to send the result back to the sender:", sender);
 
             this.transferCrossChain2(
                 0x91d18e54DAf4F677cB28167158d6dd21F6aB3921,
-                tx.origin,
+                sender,
                 gasAmount
             );
             return "";
@@ -251,7 +250,7 @@ abstract contract ConnectedNFTCore is
             (bool success, ) = payable(sender).call{value: gasAmount}("");
             if (!success) revert GasTokenTransferFailed();
         }
-        emit TokenTransferReceived(receiver, gasAmount);
+        emit MessageTransferReceived(receiver, gasAmount);
         return "";
     }
 
@@ -265,7 +264,7 @@ abstract contract ConnectedNFTCore is
             context.revertMessage,
             (uint256, address)
         );
-        emit TokenTransferReverted(
+        emit MessageTransferReverted(
             sender,
             amount,
             address(0), // gas token
