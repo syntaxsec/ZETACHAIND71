@@ -58,7 +58,7 @@ export const tokenDeploy = task(
   .addOptionalParam(
     "name",
     "The contract name to deploy",
-    "ZetaChainUniversalToken"
+    "ZetaChainUniversal"
   )
   .addOptionalParam(
     "gasLimit",

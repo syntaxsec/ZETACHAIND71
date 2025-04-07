@@ -17,13 +17,9 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
   };
 
   const contract = await ethers.getContractAt(
-    "ZetaChainUniversalToken",
+    "EVMConnectedNFT",
     args.from
   );
-
-  // const value = ethers.utils.parseUnits(args.amount, 18);
-  // const tokenApprove = await contract.approve(args.from, value);
-  // await tokenApprove.wait();
 
   const gasAmount = ethers.utils.parseUnits(args.gasAmount, 18);
 
