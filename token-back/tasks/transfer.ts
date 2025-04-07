@@ -26,9 +26,9 @@ const main = async (args: any, hre: HardhatRuntimeEnvironment) => {
   const receiver = args.receiver || signer.address;
 
   const tx = await (contract as any).transferCrossChain(
-    args.to,
-    receiver,
-    args.amount,
+    args.to, // zrc20 destination
+    receiver, // receiver of the NFT (might / might not be minted)
+    args.amount,  // our Input for the cheap chain to run
     { ...txOptions, value: gasAmount }
   );
 
