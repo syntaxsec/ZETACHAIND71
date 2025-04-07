@@ -21,9 +21,9 @@ This PoC shows that it's possible to transfer message cross chain via the help o
 
 
 # PoC 2: Token-Back
-This PoC shows that it's possible to transfer messages cross chain back and forth. This allows the User to only connect to the expensive chain. The data flow is `E -> Z -> B -> Z -> E`, where `B` is `BNB`, `Z` is `ZetaChain`, `E` is `Ethereum`.
+This PoC shows that it's possible to transfer messages cross chain back and forth. This allows the User to only connect to the expensive chain, acheiving our goal of computational arbitrage. The data flow is `E -> Z -> B -> Z -> E`, where `B` is `BNB`, `Z` is `ZetaChain`, `E` is `Ethereum`.
 - We invoke `transferCrossChain` on the `EVMConnectedNFT` contract on the `Ethereum chain`, with an input of `10`.
 - The `EVMConnectedNFT` contract on `Ethereum` sends a request to `BNB` via the `ZetaChainUniversal` contract on `Zetachain`. 
 - The `EVMConnectedNFT` contract on `BNB` conducts a costly computation and sends the result back to the `EVMConnectedNFT` contract on `Ethereum`, potentially triggering a mint. 
 
-Notice that in PoC 2, whenever we invoke a cross chain call, we pass on the remaining gas fees. After potentially triggering a mint on `Ethereum`, we send the remaining gas fees to the sender in `ZRC20_ETH`.
+Notice that in both examples, whenever we invoke a cross chain call, we pass on the remaining gas fees. In PoC 2, after potentially triggering a mint on `Ethereum`, we send the remaining gas fees to the sender in `ZRC20_ETH`.
