@@ -61,3 +61,10 @@ This PoC shows that it's possible to transfer messages cross chain back and fort
 - The `EVMConnectedNFT` contract on `BNB` conducts a costly computation and sends the result back to the `EVMConnectedNFT` contract on `Ethereum`, potentially triggering a mint. 
 
 Notice that in both examples, whenever we invoke a cross chain call, we pass on the remaining gas fees. In PoC 2, after potentially triggering a mint on `Ethereum`, we send the remaining gas fees to the sender in `ZRC20_ETH`.
+
+# Top 3 Resources
+[Gateway EVM and ZEVM protocol contracts](https://github.com/zeta-chain/protocol-contracts)
+
+[Sample Universal Apps and Contracts to be deployed in External Chain](https://github.com/zeta-chain/example-contracts)
+
+[Validator Node Docs](https://github.com/zeta-chain/node/tree/develop/docs)
