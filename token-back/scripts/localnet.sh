@@ -48,7 +48,7 @@ npx hardhat msg-back:set-connected --network localhost --contract "$CONTRACT_ZET
 
 npx hardhat localnet-check
 
-echo -e "\nTransferring message from: BNB → Ethereum. Input is 10."
+echo -e "\nTransferring message from: BNB → Ethereum (which sends a confirmation back to BNB). Input is 10."
 npx hardhat msg-back:transfer --network localhost --json --amount 10 --from "$CONTRACT_BNB" --to "$ZRC20_ETHEREUM" --gas-amount 1
 
 npx hardhat localnet-check
