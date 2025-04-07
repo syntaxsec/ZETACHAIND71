@@ -17,10 +17,6 @@ contract ConnectedNFT is
     OwnableUpgradeable,
     ConnectedNFTCore // Inherit the Universal Token core contract
 {
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
 
     function initialize(
         address initialOwner,

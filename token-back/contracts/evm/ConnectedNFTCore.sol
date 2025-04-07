@@ -11,24 +11,23 @@ import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC72
 import "../shared/UniversalTokenEvents.sol";
 
 /**
- * @title UniversalTokenCore
- * @dev This abstract contract provides the core logic for Universal Tokens. It is designed
- *      to be imported into an OpenZeppelin-based ERC20 implementation, extending its
+ * @title UniversalNFTCore
+ * @dev This abstract contract provides the core logic for Connected NFTs. It is designed
+ *      to be imported into an OpenZeppelin-based ERC721 implementation, extending its
  *      functionality with cross-chain token transfer capabilities via GatewayEVM. This
- *      contract facilitates cross-chain token transfers to and from EVM-based networks.
+ *      contract facilitates cross-chain message transfers to and from EVM-based networks. It then
+ *      allows for the minting of NFTs on the destination chain.
  *      It's important to set the universal contract address before making cross-chain transfers.
  */
 abstract contract ConnectedNFTCore is
-    // ERC20Upgradeable,
     ERC721Upgradeable,
-
     OwnableUpgradeable,
     UniversalTokenEvents
 {
     // Address of the EVM gateway contract
     GatewayEVM public gateway;
 
-    // The address of the Universal Token contract on ZetaChain. This contract serves
+    // The address of the Universal contract on ZetaChain. This contract serves
     // as a key component for handling all cross-chain transfers while also functioning
     // as an ERC-20 Universal Token.
     address public universal;
@@ -58,7 +57,7 @@ abstract contract ConnectedNFTCore is
      * @param gas New gas limit value.
      */
     function setGasLimit(uint256 gas) external 
-    // onlyOwner 
+    onlyOwner 
     {
         if (gas == 0) revert InvalidGasLimit();
         gasLimitAmount = gas;
@@ -70,7 +69,7 @@ abstract contract ConnectedNFTCore is
      * @param contractAddress The address of the universal contract.
      */
     function setUniversal(address contractAddress) external 
-    // onlyOwner 
+    onlyOwner 
     {
         if (contractAddress == address(0)) revert InvalidAddress();
         universal = contractAddress;
@@ -83,7 +82,7 @@ abstract contract ConnectedNFTCore is
      * @param gatewayAddress The address of the gateway contract.
      */
     function setGateway(address gatewayAddress) external 
-    // onlyOwner 
+    onlyOwner 
     {
         if (gatewayAddress == address(0)) revert InvalidAddress();
         gateway = GatewayEVM(gatewayAddress);
@@ -132,9 +131,7 @@ abstract contract ConnectedNFTCore is
         if (receiver == address(0)) revert InvalidAddress();
 
         console.log("!!!!!! Prepare: Connected -> ZetaChain");
-        // console.log("!!!!!! Here are the arguments (destination, receiver, amount)", destination, receiver, amount);
         console.log("!!!!!! We will be doing a costly computation. This is represented by running a for loop.");
-        // console.log("!!!!!! btw: (tx.origin, msg.sender) = ", tx.origin, msg.sender);
 
         uint256 x = 0;
         for (uint256 i = 0; i < 1000; i++) {
@@ -163,7 +160,7 @@ abstract contract ConnectedNFTCore is
                     address(this),
                     true,
                     universal,
-                    abi.encode(amount, msg.sender),
+                    abi.encode(msg.value, msg.sender),
                     gasLimitAmount
                 )
             );
@@ -219,7 +216,6 @@ abstract contract ConnectedNFTCore is
         bytes calldata message
     ) external payable onlyGateway returns (bytes4) {
         console.log("!!!!!! On destination chain");
-        // console.log("!!!!!! btw (tx.origin, msg.sender) = ", tx.origin, msg.sender);
         if (context.sender != universal) revert Unauthorized();
         (
             address receiver,
@@ -236,7 +232,6 @@ abstract contract ConnectedNFTCore is
                 console.log("!!!!! not minted because 100 < ", mymsg.amount);
             }
             mymsg.isResult = true;
-            // console.log("sending with arguments (tx.origin, sender) = ", tx.origin, sender);
             console.log("!!!!! Connected -> Zetachain. Instead of transferring the remaining gas fees to the sender, we use this as the gas fee to send the result back.");
 
             this.transferCrossChain2(
@@ -256,7 +251,7 @@ abstract contract ConnectedNFTCore is
             (bool success, ) = payable(sender).call{value: gasAmount}("");
             if (!success) revert GasTokenTransferFailed();
         }
-        // emit TokenTransferReceived(receiver, amount);
+        emit TokenTransferReceived(receiver, gasAmount);
         return "";
     }
 
@@ -270,11 +265,6 @@ abstract contract ConnectedNFTCore is
             context.revertMessage,
             (uint256, address)
         );
-        // _mint(sender, amount);
-        // if (context.amount > 0) {
-        //     (bool success, ) = payable(sender).call{value: context.amount}("");
-        //     if (!success) revert GasTokenRefundFailed();
-        // }
         emit TokenTransferReverted(
             sender,
             amount,
